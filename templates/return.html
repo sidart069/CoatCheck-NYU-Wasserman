@@ -7,12 +7,12 @@
       integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ"
       crossorigin="anonymous"
     />
-    <link rel="stylesheet" href="style.css" />
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/style.css') }}">
   </head>
   <body>
     <h1>Return Coat</h1>
     <div class="box-container">
-      <form method="POST" action="/borrow">
+      <form method="POST" action="/return">
         <br />
         <div class="form-group">
           <label for="coat_number">Coat Number</label>
@@ -27,6 +27,7 @@
 
         <br />
         <input class="btn btn-primary" type="submit" value="Submit" />
+         <a href="/">Back</a>
       </form>
     </div>
     <script
