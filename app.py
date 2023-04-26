@@ -13,17 +13,15 @@ import requests
 # Initialize the Flask application
 app = Flask(__name__)
 
+
+app.config['SECRET_KEY'] = 'insert_key_here'
+app.config['MAILGUN_API_KEY'] = 'insert_key_here'
+app.config['MAILGUN_DOMAIN'] = 'insert_key_here'
+
 # Set up the Google Sheets API credentials
 scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
 creds = ServiceAccountCredentials.from_json_keyfile_name('secret_client.json', scope)
 client = gspread.authorize(creds)
-
-
-# Set up the Mailgun API credentials
-app.config['SECRET_KEY'] = 'key_insert_here'
-app.config['MAILGUN_API_KEY'] = 'key_insert_here'
-app.config['MAILGUN_DOMAIN'] = 'key_insert_here'
-
 
 
 # Define the index page
@@ -37,6 +35,10 @@ def index():
 def borrow():
     if request.method == 'POST':
         email = request.form['email']
+        if not email.endswith('@nyu.edu'):
+            # If the email does not end with the domain "nyu.edu", return an error message
+            return 'Invalid email domain. Please enter an email with the domain "@nyu.edu"'
+
         coat_number = request.form['coat_number']
         sheet = client.open('CoatDatabase').sheet1
         coat_entries = sheet.col_values(2)
@@ -95,12 +97,14 @@ def return_coat():
         sheet.update_cell(row, 1, 'NA')
         sheet.update_cell(row, 4, 'NA')
         message = f'Thank you for returning coat number {coat_number}.'
+        '''
         requests.post('https://api.mailgun.net/v3/{}/messages'.format(app.config['MAILGUN_DOMAIN']),
                       auth=('api', app.config['MAILGUN_API_KEY']),
                       data={'from': 'nyu_wasstech@nyu.com',
                             'to': sheet.cell(row, 1).value,
                             'subject': 'Coat Return Confirmation',
                             'text': message})
+        '''
         return render_template('return_success.html', coat_number=coat_number)
     return render_template('return.html')
 
